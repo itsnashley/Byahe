@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Biyahe Ranker · Laguna</title>
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+ <div class="sbar" id="home">
+  <div class="topbar"><h1 class="appname">Biyahe Ranker</h1><button id="theme" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg><span id="themeLbl">Dark</span></button></div>
+  <div class="pill">
+   <div class="logo">B</div>
+   <input id="origin" autocomplete="off" placeholder="From" value="Los Baños" aria-label="From">
+   <span class="to">to</span>
+   <input id="dest" autocomplete="off" placeholder="To" value="Calamba" aria-label="To">
+   <button class="rb" id="swap" aria-label="Swap">⇄</button>
+   <button class="rb go" id="go" aria-label="Search routes"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+  </div>
+  <div class="dd" id="dd" hidden></div>
+ </div>
+
+ <div class="page" id="pageMain">
+ <section class="card" id="search">
+  <div class="ch"><h2>Trip budget</h2><span class="mute">Your spending limit</span></div>
+  <label class="f">Most you can spend (₱)<input class="fi" id="budget" type="number" min="0" value="60"></label>
+  <div class="err" id="err" role="alert" hidden></div>
+  <div class="note" id="msg"></div>
+ </section>
+
+ <section class="card" id="hero"></section>
+
+
+
+ <section class="card" id="routes">
+  <div class="ch"><h2>Ranked routes</h2><span class="mute" id="tripLbl"></span></div>
+  <div class="pills" id="toggle"><button data-k="fare" class="on">Cheapest</button><button data-k="time">Fastest</button><button data-k="tr">Fewest transfers</button><button data-k="best">Best overall</button></div>
+  <p class="note" id="rule"></p>
+  <button class="btn sm ln" id="saveTrip" style="margin-top:8px">☆ Save this trip</button>
+  <div id="out"></div>
+ </section>
+
+ <section class="card gw" id="gauge"></section>
+
+
+ <div class="disc">ℹ️ <b>Estimates only.</b> Fares, travel times and distances shown here are rough estimates and may not be 100% accurate. Actual prices can change by driver, time of day, traffic and LTFRB updates. Please confirm with the driver or at <a href="https://ltfrb.gov.ph" target="_blank" rel="noopener">ltfrb.gov.ph</a>.</div>
+
+ <details class="card" id="add">
+  <summary>Add your own route</summary>
+  <div class="g2">
+   <label class="f">Vehicle<select id="veh"></select></label>
+   <label class="f">Fare (₱)<input id="fare" type="number" min="0" value="40"></label>
+   <label class="f">Time (min)<input id="time" type="number" min="1" value="60"></label>
+   <label class="f">Transfers<input id="tr" type="number" min="0" value="0"></label>
+  </div>
+  <button class="btn" id="addBtn">Add route</button>
+  <p class="note">Fares and distances are rough estimates. Confirm at <a href="https://ltfrb.gov.ph" target="_blank" rel="noopener">ltfrb.gov.ph</a> or with the driver.</p>
+ </details>
+ </div>
+
+ <div class="page" id="pageFares" hidden>
+ <section class="card">
+  <div class="ch"><h2>Fare guide</h2><span class="mute">Estimates</span></div>
+  <div id="dbBox"></div>
+ </section>
+ <div class="disc">ℹ️ <b>Estimates only.</b> Fares, travel times and distances shown here are rough estimates and may not be 100% accurate. Actual prices can change by driver, time of day, traffic and LTFRB updates. Please confirm with the driver or at <a href="https://ltfrb.gov.ph" target="_blank" rel="noopener">ltfrb.gov.ph</a>.</div>
+ </div>
+
+ <div class="page" id="pageSaved" hidden>
+ <section class="card">
+  <div class="ch"><h2>Saved trips</h2><span class="mute" id="savedCount"></span></div>
+  <div id="savedBox"></div>
+ </section>
+ <div class="disc">ℹ️ <b>Estimates only.</b> Fares, travel times and distances shown here are rough estimates and may not be 100% accurate. Actual prices can change by driver, time of day, traffic and LTFRB updates. Please confirm with the driver or at <a href="https://ltfrb.gov.ph" target="_blank" rel="noopener">ltfrb.gov.ph</a>.</div>
+ </div>
+
+ <div class="page" id="pageSettings" hidden>
+ <section class="card">
+  <div class="ch"><h2>Preferences</h2><span class="mute">Kept on this device</span></div>
+  <div class="g2">
+   <label class="f">Default budget (₱)<input id="setBudget" type="number" min="0"></label>
+   <label class="f">Time per transfer (min)<input id="setHop" type="number" min="0"></label>
+   <label class="f">Waiting per ride (min)<input id="setBoard" type="number" min="0"></label>
+   <label class="f">Max detour (×)<input id="setDetour" type="number" min="1" step="0.1"></label>
+  </div>
+  <button class="btn" id="setSave">Save settings</button>
+  <button class="btn ln" id="setReset" style="margin-top:8px">Reset to defaults</button>
+  <button class="btn ln" id="clearSaved" style="margin-top:8px">Clear saved trips</button>
+  <p class="note" id="setMsg"></p>
+ </section>
+ <div class="ch" style="margin:4px 4px 0"><h2>Insights</h2><span class="mute">How the app sorted</span></div>
+ <section id="stats">
+  <div class="hs">
+   <div style="background:var(--bbg)"><h3>Sorting</h3><span class="mute">Times routes were compared</span><div class="n" id="cmpN">0</div></div>
+   <div style="background:var(--b2)"><h3>Time taken</h3><span class="mute">Time to sort your routes</span><div class="n" id="msN">0 ms</div></div>
+   <div style="background:var(--b3)"><h3>Budget check</h3><span class="mute">Fare combinations tried to fit your budget</span><div class="n" id="knN">0</div></div>
+   <div style="background:var(--bbg)"><h3>Speed test</h3><span class="mute">Fast vs slow sorting, 5,000 routes</span><div style="margin:8px 0"><button class="btn sm" id="speed">Run test</button></div><div id="speedOut" class="mute"></div></div>
+  </div>
+ </section>
+ </div>
+</div>
+
+<nav class="nav"><div>
+ <button data-go="main"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z"/></svg>Home</button>
+ <button data-go="fares"><svg viewBox="0 0 24 24"><path d="M4 8h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/></svg>Fares</button>
+ <button data-go="saved"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-4-5 4z"/></svg>Saved</button>
+ <button data-go="settings"><svg viewBox="0 0 24 24"><path d="M5 7h14M5 17h14"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg>Settings</button>
+</div></nav>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
